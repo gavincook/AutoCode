@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            nameFilter="*.cfg"
+            objectClass="org.eclipse.core.resources.IFile"
+            id="AutoCode.contribution1">
+         <!--<menu
+               label="AutoCode"
+               path="additions"
+               id="AutoCode.menu1">
+            <separator
+                  name="group1">
+            </separator>
+         </menu>-->
+         <action
+               label="Auto Code"
+               class="org.antstudio.autocode.actions.AutoCodeAction"
+               enablesFor="1"
+               id="AutoCode.newAction">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>
