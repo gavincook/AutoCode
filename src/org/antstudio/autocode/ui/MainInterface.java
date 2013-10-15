@@ -7,12 +7,15 @@ import org.antstudio.autocode.container.Container;
 import org.antstudio.autocode.ui.event.ActionAdapter;
 import org.antstudio.autocode.ui.event.ButtonType;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -47,56 +50,103 @@ public class MainInterface {
 	private void initComponent(Shell shell){
 			shell.setLayout(new GridLayout(2, false));
 			
-			Label label = new Label(shell, SWT.SHADOW_IN | SWT.CENTER);
+
+			Composite modeSelector = new Composite(shell, SWT.NONE);
+			modeSelector.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 2, 1));
+			modeSelector.setLayout(new GridLayout(3, false));
+			
+			Button dbTypeBtn = new Button(modeSelector, SWT.RADIO);
+			dbTypeBtn.setText("Table");
+			
+			
+			new Button(modeSelector, SWT.RADIO).setText("Domain");
+			
+			
+			final Composite domainModeContainer = new Composite(shell, SWT.FILL);
+			domainModeContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 7));
+			domainModeContainer.setLayout(new GridLayout(2, false));
+			
+			new Button(domainModeContainer,SWT.NONE).setText("选择");
+			
+			
+			
+			
+			
+			final Composite dbModeContainer = new Composite(shell, SWT.FILL);
+			dbModeContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 7));
+			dbModeContainer.setLayout(new GridLayout(2, false));
+			
+			
+			dbTypeBtn.addMouseListener(new MouseListener() {
+				
+				@Override
+				public void mouseUp(MouseEvent arg0) {
+					domainModeContainer.setVisible(false);
+					dbModeContainer.setVisible(true);
+				}
+				
+				@Override
+				public void mouseDown(MouseEvent arg0) {
+					domainModeContainer.setVisible(true);
+					dbModeContainer.setVisible(false);
+				}
+				
+				@Override
+				public void mouseDoubleClick(MouseEvent arg0) {
+					
+				}
+			});
+
+			Label label = new Label(dbModeContainer, SWT.SHADOW_IN | SWT.CENTER);
 			label.setAlignment(SWT.RIGHT);
 			GridData gd_label = new GridData(SWT.RIGHT, SWT.CENTER, false, true, 1, 1);
 			gd_label.widthHint = 69;
 			label.setLayoutData(gd_label);
-			label.setText("\u6570\u636E\u5E93\u8DEF\u5F84");
+			label.setText("数据库路径");
 			
-			text = new Text(shell, SWT.BORDER);
+			text = new Text(dbModeContainer, SWT.BORDER);
 			text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 			
-			Label label_1 = new Label(shell, SWT.NONE);
+			Label label_1 = new Label(dbModeContainer, SWT.NONE);
 			label_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, true, 1, 1));
 			label_1.setText("\u7528\u6237\u540D");
 			
-			text_1 = new Text(shell, SWT.BORDER);
+			text_1 = new Text(dbModeContainer, SWT.BORDER);
 			text_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 			
-			Label label_2 = new Label(shell, SWT.NONE);
+			Label label_2 = new Label(dbModeContainer, SWT.NONE);
 			label_2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, true, 1, 1));
 			label_2.setText("\u5BC6\u7801");
 			
-			text_2 = new Text(shell, SWT.BORDER);
+			text_2 = new Text(dbModeContainer, SWT.BORDER);
 			text_2.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 			
-			Label label_3 = new Label(shell, SWT.NONE);
+			Label label_3 = new Label(dbModeContainer, SWT.NONE);
 			label_3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, true, 1, 1));
 			label_3.setText("\u9A71\u52A8");
 			
-			combo = new Combo(shell, SWT.NONE);
+			combo = new Combo(dbModeContainer, SWT.NONE);
 			combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 			
-			Label label_4 = new Label(shell, SWT.NONE);
+			Label label_4 = new Label(dbModeContainer, SWT.NONE);
 			label_4.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, true, 1, 1));
 			label_4.setText("\u8868\u540D");
 			
-			text_4 = new Text(shell, SWT.BORDER);
+			text_4 = new Text(dbModeContainer, SWT.BORDER);
 			text_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 			
-			Label label_5 = new Label(shell, SWT.NONE);
+			Label label_5 = new Label(dbModeContainer, SWT.NONE);
 			label_5.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, true, 1, 1));
 			label_5.setText("\u5305\u8DEF\u5F84");
 			
-			text_5 = new Text(shell, SWT.BORDER);
+			text_5 = new Text(dbModeContainer, SWT.BORDER);
 			text_5.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 			
-			Label label_6 = new Label(shell, SWT.NONE);
+			Label label_6 = new Label(dbModeContainer, SWT.NONE);
 			label_6.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, true, 1, 1));
 			label_6.setText("\u5B9E\u4F53\u540D\u79F0");
 			
-			text_6 = new Text(shell, SWT.BORDER);
+			text_6 = new Text(dbModeContainer, SWT.BORDER);
 			text_6.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 			
 			Group group = new Group(shell, SWT.NONE);
@@ -140,6 +190,10 @@ public class MainInterface {
 			button_2.setLayoutData(gd_button_2);
 			button_2.setText("\u53D6\u6D88");
 			
+			new Label(shell, SWT.NONE);
+			FileDialog ds = new FileDialog(shell);
+			ds.setText("ddddddddddd");
+			
 			Container.register("ui_dbPath", text);
 			Container.register("ui_userName", text_1);
 			Container.register("ui_password", text_2);
@@ -173,10 +227,11 @@ public class MainInterface {
 		params.put("jsp", btnJsp.getSelection()+"");
 		return params;
 	}
+	
 	public static void main(String[] args) {
 		Display display = new Display();
 		Shell shell = new Shell(display);
-		//new MainInterface().init(shell);
+		new MainInterface().init(shell);
 		while (!shell.isDisposed()){
 		    if (!display.readAndDispatch()){ 
 			display.sleep ();
