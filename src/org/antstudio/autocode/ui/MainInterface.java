@@ -9,8 +9,10 @@ import org.antstudio.autocode.ui.event.ButtonType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -19,6 +21,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
 
@@ -47,55 +51,55 @@ public class MainInterface {
 		shell.open();
 	}
 	
-	private void initComponent(Shell shell){
+	private void initComponent(final Shell shell){
 			shell.setLayout(new GridLayout(2, false));
 			
-
-			Composite modeSelector = new Composite(shell, SWT.NONE);
-			modeSelector.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 2, 1));
-			modeSelector.setLayout(new GridLayout(3, false));
-			
-			Button dbTypeBtn = new Button(modeSelector, SWT.RADIO);
-			dbTypeBtn.setText("Table");
-			
-			
-			new Button(modeSelector, SWT.RADIO).setText("Domain");
+			TabFolder tf = new TabFolder(shell, SWT.NONE);
+			tf.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 7));
+			TabItem dbTypeTab = new TabItem(tf, SWT.NONE);
+			dbTypeTab.setText("Table");
+			TabItem domainTypeTab = new TabItem(tf, SWT.NONE);
+			domainTypeTab.setText("Domain");
 			
 			
-			final Composite domainModeContainer = new Composite(shell, SWT.FILL);
-			domainModeContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 7));
-			domainModeContainer.setLayout(new GridLayout(2, false));
+			Composite domainModeContainer = new Composite(tf, SWT.NONE);
+			domainModeContainer.setLayout(new FillLayout());
 			
-			new Button(domainModeContainer,SWT.NONE).setText("Ñ¡Ôñ");
+			final Text domainPath = new Text(domainModeContainer, SWT.NONE);
+			Button domainSelector = new Button(domainModeContainer,SWT.NONE);
+			domainSelector.setText("Ñ¡Ôñ");
 			
+			domainTypeTab.setControl(domainModeContainer);
 			
 			
 			
-			
-			final Composite dbModeContainer = new Composite(shell, SWT.FILL);
-			dbModeContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 7));
-			dbModeContainer.setLayout(new GridLayout(2, false));
-			
-			
-			dbTypeBtn.addMouseListener(new MouseListener() {
+			domainSelector.addMouseListener(new MouseListener() {
 				
 				@Override
 				public void mouseUp(MouseEvent arg0) {
-					domainModeContainer.setVisible(false);
-					dbModeContainer.setVisible(true);
+					FileDialog ds = new FileDialog(shell,SWT.SAVE);
+					domainPath.setText(ds.open());
 				}
 				
 				@Override
 				public void mouseDown(MouseEvent arg0) {
-					domainModeContainer.setVisible(true);
-					dbModeContainer.setVisible(false);
+					// TODO Auto-generated method stub
+					
 				}
 				
 				@Override
 				public void mouseDoubleClick(MouseEvent arg0) {
+					// TODO Auto-generated method stub
 					
 				}
 			});
+			
+			
+			Composite dbModeContainer = new Composite(tf, SWT.FILL);
+			dbModeContainer.setLayout(new GridLayout(2, false));
+			
+			dbTypeTab.setControl(dbModeContainer);
+			
 
 			Label label = new Label(dbModeContainer, SWT.SHADOW_IN | SWT.CENTER);
 			label.setAlignment(SWT.RIGHT);
@@ -190,9 +194,6 @@ public class MainInterface {
 			button_2.setLayoutData(gd_button_2);
 			button_2.setText("\u53D6\u6D88");
 			
-			new Label(shell, SWT.NONE);
-			FileDialog ds = new FileDialog(shell);
-			ds.setText("ddddddddddd");
 			
 			Container.register("ui_dbPath", text);
 			Container.register("ui_userName", text_1);
