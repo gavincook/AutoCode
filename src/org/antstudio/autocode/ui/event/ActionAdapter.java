@@ -1,6 +1,7 @@
 package org.antstudio.autocode.ui.event;
 
 import java.io.IOException;
+import java.net.URLClassLoader;
 
 import org.antstudio.autocode.container.Container;
 import org.antstudio.autocode.service.AutoCodeService;
@@ -26,11 +27,9 @@ public class ActionAdapter extends MouseAdapter{
 				Container.get("autoCodeService", AutoCodeService.class).prepareGenerateCode(
 						Container.get("mainInterface", MainInterface.class).getValues()
 						);
-			} catch (TemplateException e1) {
+			} catch ( Exception e1) {
 				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			} 
 		}else if(type.equals(ButtonType.Cancel)){
 			((Shell)Container.get("shell")).close();
 		}
