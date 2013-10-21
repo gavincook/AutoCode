@@ -15,7 +15,7 @@ public class FileSystemClassLoader extends ClassLoader{
 	  private String rootDir; 
 
 	    public FileSystemClassLoader(String rootDir) { 
-	    	super(FileSystemClassLoader.class.getClassLoader());
+	    	super(getSystemClassLoader());
 	        this.rootDir = rootDir; 
 	    } 
 

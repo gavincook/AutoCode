@@ -4,5 +4,6 @@ package org.antstudio.autocode.ui.event;
  * @date 2013-10-3 обнГ10:04:54
  */
 public enum ButtonType{
-	Generate,Cancel;
+	Generate,Cancel,
+	BasedirSelector,DomainSelector;
 }

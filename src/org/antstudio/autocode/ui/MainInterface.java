@@ -1,23 +1,17 @@
 package org.antstudio.autocode.ui;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.antstudio.autocode.annotation.Column;
-import org.antstudio.autocode.classloader.FileSystemClassLoader;
 import org.antstudio.autocode.container.Container;
 import org.antstudio.autocode.ui.event.ActionAdapter;
 import org.antstudio.autocode.ui.event.ButtonType;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -42,7 +36,7 @@ public class MainInterface {
 	private Combo combo;
 	private Button btnCheckButton,btnCheckButton_1,btnRepository,btnJsp;
 	private TabFolder tf;
-	private Text domainDir,domainName;
+	private Text baseDir,domainName;
 	public void init(Shell parent){
 		GridLayout layout = new GridLayout(2, false);
 		Shell shell = new Shell(parent,SWT.SHEET);
@@ -57,63 +51,63 @@ public class MainInterface {
 	private void initComponent(final Shell shell){
 			shell.setLayout(new GridLayout(2, false));
 			
+			/*----------------------tab--------------------------------*/
 			tf = new TabFolder(shell, SWT.NONE);
 			tf.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 9));
+			
+			//数据库模式tab
 			TabItem dbTypeTab = new TabItem(tf, SWT.NONE);
 			dbTypeTab.setText("Table");
-			TabItem domainTypeTab = new TabItem(tf, SWT.NONE);
-			domainTypeTab.setText("Domain");
 			
+			
+			/*----------------------Domain模式tab--------------------------------*/
 			Composite domainModeContainer = new Composite(tf, SWT.FILL);
-			GridLayout domainLayout = new GridLayout(2, false);
+			GridLayout domainLayout = new GridLayout(3, false);
 			domainModeContainer.setLayout(domainLayout);
 			
-			domainDir = new Text(domainModeContainer, SWT.BORDER);
-			domainDir.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+			//第一行
+			Label baseDirLabel = new Label(domainModeContainer, SWT.NONE);
+			baseDirLabel.setText("Base路径：");
+			baseDirLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+			baseDir = new Text(domainModeContainer, SWT.BORDER);
+			baseDir.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+			Button baseDirSelector = new Button(domainModeContainer,SWT.NONE);
+			baseDirSelector.setText("  选择  ");
+			baseDirSelector.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+			
+			Container.register("baseDir", baseDir);
+			Container.register("baseDirSelector", baseDirSelector);
+			
+			//第二行
+			Label domainNameLabel = new Label(domainModeContainer, SWT.NONE);
+			domainNameLabel.setText("类名:");
+			domainNameLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+			domainName = new Text(domainModeContainer, SWT.BORDER);
+			domainName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 			Button domainSelector = new Button(domainModeContainer,SWT.NONE);
 			domainSelector.setText("  选择  ");
 			domainSelector.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+			domainSelector.setEnabled(false);//默认为不可点击,需要先选择basedir
 			
-			Composite com = new Composite(domainModeContainer, SWT.NONE);
-			com.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
-			com.setLayout(domainLayout);
-			Label domainNameLabel = new Label(com, SWT.NONE);
-			domainNameLabel.setText("类名");
-			domainNameLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-			domainName = new Text(com, SWT.BORDER);
-			domainName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+			Container.register("domainName", domainName);
+			Container.register("domainSelector", domainSelector);
 			
+			//为两个选择按钮分别添加事件处理
+			domainSelector.addMouseListener(new ActionAdapter(ButtonType.DomainSelector));
+			baseDirSelector.addMouseListener(new ActionAdapter(ButtonType.BasedirSelector));
+			
+			//定义Domain模式tab
+			TabItem domainTypeTab = new TabItem(tf, SWT.NONE);
+			domainTypeTab.setText("Domain");
 			domainTypeTab.setControl(domainModeContainer);
-			
-			
-			
-			domainSelector.addMouseListener(new MouseListener() {
-				
-				@Override
-				public void mouseUp(MouseEvent arg0) {
-					DirectoryDialog ds = new DirectoryDialog(shell,SWT.OPEN);
-					domainDir.setText(ds.open());
-				}
-				
-				@Override
-				public void mouseDown(MouseEvent arg0) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-				@Override
-				public void mouseDoubleClick(MouseEvent arg0) {
-					// TODO Auto-generated method stub
-					
-				}
-			});
+			/*----------------------/Domain模式tab--------------------------------*/
 			
 			
 			Composite dbModeContainer = new Composite(tf, SWT.FILL);
 			dbModeContainer.setLayout(new GridLayout(2, false));
 			
 			dbTypeTab.setControl(dbModeContainer);
-			
+			/*----------------------/tab--------------------------------*/
 
 			Label label = new Label(dbModeContainer, SWT.SHADOW_IN | SWT.CENTER);
 			label.setAlignment(SWT.RIGHT);
@@ -227,8 +221,9 @@ public class MainInterface {
 			button_2.addMouseListener(new ActionAdapter(ButtonType.Cancel));
 	}
 	
-	public Map<String,String> getValues() throws Exception{
+	public Map<String,String> getValues(){
 		Map<String,String> params = new HashMap<String, String>();
+		/*----------------------数据库配置信息--------------------------------*/
 		params.put("dbPath", text.getText());
 		params.put("userName", text_1.getText());
 		params.put("password", text_2.getText());
@@ -240,9 +235,14 @@ public class MainInterface {
 		params.put("service", btnCheckButton_1.getSelection()+"");
 		params.put("repository", btnRepository.getSelection()+"");
 		params.put("jsp", btnJsp.getSelection()+"");
+		/*----------------------/数据库配置信息--------------------------------*/
 		
 		params.put("type", tf.getSelection()[0].getText());//当前生成模式
 		
+		/*----------------------domain信息--------------------------------*/
+		params.put("baseDir", baseDir.getText());
+		params.put("domainName", domainName.getText().replaceAll("\\\\", ".").substring(1));
+		/*----------------------/domain信息--------------------------------*/
 		return params;
 	}
 	

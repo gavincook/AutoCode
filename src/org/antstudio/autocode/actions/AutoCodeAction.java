@@ -57,7 +57,7 @@ public class AutoCodeAction implements IObjectActionDelegate {
 		    if(tpath[0].getLastSegment() instanceof File){
 		    	Project project = (Project) tpath[0].getFirstSegment();
 		    	File file = (File) tpath[0].getLastSegment();
-		    	Container.register("baseDir", project.getLocation().toFile().getAbsolutePath());//项目绝对路径
+		    	Container.register("contextPath", project.getLocation().toFile().getAbsolutePath());//项目绝对路径
 		    	try {
 					InputStream in = file.getContents();
 					Properties p = new Properties();
