@@ -14,8 +14,8 @@ import java.io.InputStream;
 public class FileSystemClassLoader extends ClassLoader{
 	  private String rootDir; 
 
-	    public FileSystemClassLoader(String rootDir) { 
-	    	super(getSystemClassLoader());
+	    public FileSystemClassLoader(String rootDir,ClassLoader classLoader) { 
+	    	super(classLoader);
 	        this.rootDir = rootDir; 
 	    } 
 

@@ -33,6 +33,7 @@ public class MainInterface {
 	private Text text_4;
 	private Text text_5;
 	private Text text_6;
+	private Text packageName;
 	private Combo combo;
 	private Button btnCheckButton,btnCheckButton_1,btnRepository,btnJsp;
 	private TabFolder tf;
@@ -91,6 +92,13 @@ public class MainInterface {
 			
 			Container.register("domainName", domainName);
 			Container.register("domainSelector", domainSelector);
+			
+			//第三行
+			Label packageLabel = new Label(domainModeContainer, SWT.NONE);
+			packageLabel.setText("包名:");
+			packageLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+			packageName = new Text(domainModeContainer, SWT.BORDER);
+			packageName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 			
 			//为两个选择按钮分别添加事件处理
 			domainSelector.addMouseListener(new ActionAdapter(ButtonType.DomainSelector));
@@ -221,8 +229,8 @@ public class MainInterface {
 			button_2.addMouseListener(new ActionAdapter(ButtonType.Cancel));
 	}
 	
-	public Map<String,String> getValues(){
-		Map<String,String> params = new HashMap<String, String>();
+	public Map<String,Object> getValues(){
+		Map<String,Object> params = new HashMap<String, Object>();
 		/*----------------------数据库配置信息--------------------------------*/
 		params.put("dbPath", text.getText());
 		params.put("userName", text_1.getText());
@@ -236,6 +244,10 @@ public class MainInterface {
 		params.put("repository", btnRepository.getSelection()+"");
 		params.put("jsp", btnJsp.getSelection()+"");
 		/*----------------------/数据库配置信息--------------------------------*/
+		
+		if("domain".equals(tf.getSelection()[0].getText())){
+			params.put("package", packageName.getText());
+		}
 		
 		params.put("type", tf.getSelection()[0].getText());//当前生成模式
 		

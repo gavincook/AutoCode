@@ -26,7 +26,14 @@ public class AutoCodeService {
 	public AutoCodeService(Properties p){
 		this.properties = p;
 	}
-	public void prepareGenerateCode(Map<String,String> data) throws TemplateException, IOException{
+	
+	/**
+	 * 根据配置生成代码
+	 * @param data 数据(可来自于数据表也可来自于Domain)
+	 * @throws TemplateException
+	 * @throws IOException
+	 */
+	public void generateCode(Map<String,Object> data) throws TemplateException, IOException{
 		for(Object key:properties.keySet()){
 			if(key.toString().startsWith("in.")){
 				String outPath = properties.getProperty("out."+key.toString().substring(3));
@@ -35,6 +42,7 @@ public class AutoCodeService {
 					createFolderIfNecessary(outPath);
 					generateCode(data,properties.getProperty((String) key),outPath+key.toString().substring(3));
 				}else{
+					System.out.println(outPath);
 					createFolderIfNecessary(outPath);
 					generateCode(data,properties.getProperty((String) key),outPath);
 				}
@@ -47,10 +55,10 @@ public class AutoCodeService {
 	 * @param path
 	 */
 	private void createFolderIfNecessary(String path){
-		String baseDir = Container.get("baseDir", String.class);
+		String contextPath = Container.get("contextPath", String.class);
 		File f;
 		if(path.startsWith("/")){//相对路径
-			f = new File(baseDir+path.substring(0,path.lastIndexOf("/")));
+			f = new File(contextPath+path.substring(0,path.lastIndexOf("/")));
 		}else{//绝对路径
 			f = new File(path.substring(0,path.lastIndexOf("/")));
 		}
@@ -68,17 +76,25 @@ public class AutoCodeService {
 		}
 	}
 	
-	private void generateCode(Map<String,String> data,String path,String outPath) throws TemplateException, IOException{
-		String baseDir = Container.get("baseDir", String.class);
+	/**
+	 * 生成代码文件
+	 * @param data 数据
+	 * @param path 模板文件路径
+	 * @param outPath 输出路径
+	 * @throws TemplateException
+	 * @throws IOException
+	 */
+	private void generateCode(Map<String,Object> data,String path,String outPath) throws TemplateException, IOException{
+		String contextPath = Container.get("contextPath", String.class);
 		Configuration configuration = new Configuration();
 		configuration.setEncoding(Locale.getDefault(), "UTF-8");
 		//StringTemplateLoader stl = new StringTemplateLoader();
 		//stl.putTemplate(path, "这真的就是个测试${dbPath}");
 		//configuration.setTemplateLoader(stl);
-		configuration.setDirectoryForTemplateLoading(new File(baseDir));
+		configuration.setDirectoryForTemplateLoading(new File(contextPath));
 		Template template = configuration.getTemplate(path);
 		if(outPath.startsWith("/")){
-			outPath=baseDir+outPath;
+			outPath=contextPath+outPath;
 		}
 		File dist = new File(outPath);
 		if(!dist.exists()){
@@ -86,6 +102,7 @@ public class AutoCodeService {
 			dist.createNewFile();
 		}
 		Writer writer = new OutputStreamWriter(new FileOutputStream(dist));
+		data.put("test","hahaha");
 		template.process(data, writer);
 		writer.close();
 	}

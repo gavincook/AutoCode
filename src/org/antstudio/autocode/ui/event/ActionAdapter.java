@@ -1,8 +1,13 @@
 package org.antstudio.autocode.ui.event;
 
+import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
+import org.antstudio.autocode.annotation.Column;
 import org.antstudio.autocode.classloader.FileSystemClassLoader;
 import org.antstudio.autocode.container.Container;
 import org.antstudio.autocode.service.AutoCodeService;
@@ -14,6 +19,8 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import freemarker.template.TemplateException;
 
 public class ActionAdapter extends MouseAdapter{
 
@@ -29,23 +36,35 @@ public class ActionAdapter extends MouseAdapter{
 	public void mouseUp(MouseEvent e) {
 		switch (type) {
 		case Generate:
-			Map<String,String> params = Container.get("mainInterface", MainInterface.class).getValues();
+			Map<String,Object> params = Container.get("mainInterface", MainInterface.class).getValues();
+			AutoCodeService autoCodeService = Container.get("autoCodeService", AutoCodeService.class);
 			if("Table".equals(params.get("type"))){//数据模式
 				try {
-					Container.get("autoCodeService", AutoCodeService.class).prepareGenerateCode(
+					autoCodeService.generateCode(
 							Container.get("mainInterface", MainInterface.class).getValues()
 							);
 				} catch ( Exception e1) {
 					e1.printStackTrace();
 				} 
 			}else{//domain模式
-				FileSystemClassLoader classLoader = new FileSystemClassLoader(params.get("baseDir"));
-				System.out.println(params.get("baseDir"));
+				FileSystemClassLoader classLoader = new FileSystemClassLoader(params.get("baseDir").toString(),this.getClass().getClassLoader());
+				Map<String,Object> columns = new TreeMap<String, Object>();
 				try {
-					System.out.println(params.get("domainName"));
-					Class<?> c = classLoader.loadClass(params.get("domainName"));
+					Class<?> c = classLoader.loadClass(params.get("domainName").toString());
+					//data.put(key, value)
 					for(Field f:c.getDeclaredFields()){
-						System.out.println(f.getName());
+						if(f.isAnnotationPresent(Column.class)){
+							columns.put(f.getName(),f.getAnnotation(Column.class));
+						}
+					}
+					Map<String,Object> data = new HashMap<String, Object>();
+					data.put("columns", columns);
+					try {
+						autoCodeService.generateCode(data);
+					} catch (TemplateException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						e1.printStackTrace();
 					}
 				} catch (ClassNotFoundException e1) {
 					e1.printStackTrace();
