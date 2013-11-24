@@ -1,7 +1,6 @@
 package org.antstudio.autocode.ui.event;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,12 +9,14 @@ import java.util.TreeMap;
 import org.antstudio.autocode.annotation.Column;
 import org.antstudio.autocode.classloader.FileSystemClassLoader;
 import org.antstudio.autocode.container.Container;
+import org.antstudio.autocode.dialog.TreeDialog;
 import org.antstudio.autocode.service.AutoCodeService;
 import org.antstudio.autocode.ui.MainInterface;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -82,11 +83,17 @@ public class ActionAdapter extends MouseAdapter{
 			Container.get("domainSelector", Button.class).setEnabled(true);
 			break;
 		case DomainSelector:
-			FileDialog fdg = new FileDialog(shell);
-			String baseDir = Container.get("baseDir", Text.class).getText().replaceAll("\\\\", "\\\\\\\\");
-			fdg.setFilterPath(baseDir);
-			fdg.setFilterExtensions(new String[]{"*.class"});
-			Container.get("domainName", Text.class).setText(fdg.open().replaceAll(baseDir, "").replace(".class", ""));
+			if(Container.get("fromProject", Boolean.class)){//从项目现则
+				System.out.println(shell.getDisplay()+"..."+Container.get("contextPath", String.class));
+				TreeDialog td = new TreeDialog(Display.getCurrent().getActiveShell(), Container.get("contextPath", String.class));
+				td.open();
+			}else{
+				FileDialog fdg = new FileDialog(shell);
+				String baseDir = Container.get("baseDir", Text.class).getText().replaceAll("\\\\", "\\\\\\\\");
+				fdg.setFilterPath(baseDir);
+				fdg.setFilterExtensions(new String[]{"*.class"});
+				Container.get("domainName", Text.class).setText(fdg.open().replaceAll(baseDir, "").replace(".class", ""));
+			}
 			break;
 		default:
 			break;

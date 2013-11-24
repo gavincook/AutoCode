@@ -1,20 +1,27 @@
 package org.antstudio.autocode.ui;
 
+import java.awt.CheckboxGroup;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.antstudio.autocode.container.Container;
 import org.antstudio.autocode.ui.event.ActionAdapter;
 import org.antstudio.autocode.ui.event.ButtonType;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -65,27 +72,42 @@ public class MainInterface {
 			Composite domainModeContainer = new Composite(tf, SWT.FILL);
 			GridLayout domainLayout = new GridLayout(3, false);
 			domainModeContainer.setLayout(domainLayout);
-			
 			//第一行
+			Composite radioGroup = new Composite(domainModeContainer, SWT.NULL);
+			Button fromFileSystem = new Button(radioGroup, SWT.RADIO);
+			fromFileSystem.setText("从文件系统中选择");
+			fromFileSystem.setData("from", "fromFileSystem");
+			fromFileSystem.setSelection(true);
+			Container.register("fromProject", false);//默认文件系统选择
+			
+			Button fromProject = new Button(radioGroup, SWT.RADIO);
+			fromProject.setText("从项目中选择");
+			fromProject.setData("from", "fromProject");
+			
+			radioGroup.setLayout(new RowLayout());
+			radioGroup.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false, 3, 1));
+			
+			
+			//第二行
 			Label baseDirLabel = new Label(domainModeContainer, SWT.NONE);
 			baseDirLabel.setText("Base路径：");
 			baseDirLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
 			baseDir = new Text(domainModeContainer, SWT.BORDER);
 			baseDir.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-			Button baseDirSelector = new Button(domainModeContainer,SWT.NONE);
+			final Button baseDirSelector = new Button(domainModeContainer,SWT.NONE);
 			baseDirSelector.setText("  选择  ");
 			baseDirSelector.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 			
 			Container.register("baseDir", baseDir);
 			Container.register("baseDirSelector", baseDirSelector);
 			
-			//第二行
+			//第三行
 			Label domainNameLabel = new Label(domainModeContainer, SWT.NONE);
 			domainNameLabel.setText("类名:");
 			domainNameLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
 			domainName = new Text(domainModeContainer, SWT.BORDER);
 			domainName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-			Button domainSelector = new Button(domainModeContainer,SWT.NONE);
+			final Button domainSelector = new Button(domainModeContainer,SWT.NONE);
 			domainSelector.setText("  选择  ");
 			domainSelector.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 			domainSelector.setEnabled(false);//默认为不可点击,需要先选择basedir
@@ -93,7 +115,7 @@ public class MainInterface {
 			Container.register("domainName", domainName);
 			Container.register("domainSelector", domainSelector);
 			
-			//第三行
+			//第四行
 			Label packageLabel = new Label(domainModeContainer, SWT.NONE);
 			packageLabel.setText("包名:");
 			packageLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
@@ -103,6 +125,29 @@ public class MainInterface {
 			//为两个选择按钮分别添加事件处理
 			domainSelector.addMouseListener(new ActionAdapter(ButtonType.DomainSelector));
 			baseDirSelector.addMouseListener(new ActionAdapter(ButtonType.BasedirSelector));
+			
+			/**
+			 * domain 模式下的项目和文件系统选择方式
+			 */
+			fromProject.addSelectionListener(new SelectionListener() {
+	
+				@Override
+				public void widgetSelected(SelectionEvent event) {
+					Button btn = (Button) event.getSource();
+					if(btn.getSelection()){
+						Container.register("fromProject", true);
+						domainSelector.setEnabled(true);
+						baseDirSelector.setEnabled(false);
+					}else{
+						Container.register("fromProject", false);
+						baseDirSelector.setEnabled(true);
+					}
+				}
+	
+				@Override
+				public void widgetDefaultSelected(SelectionEvent arg0) {
+				}
+			});
 			
 			//定义Domain模式tab
 			TabItem domainTypeTab = new TabItem(tf, SWT.NONE);
