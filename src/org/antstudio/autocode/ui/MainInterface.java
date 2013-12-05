@@ -1,13 +1,11 @@
 package org.antstudio.autocode.ui;
 
-import java.awt.CheckboxGroup;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.antstudio.autocode.container.Container;
 import org.antstudio.autocode.ui.event.ActionAdapter;
 import org.antstudio.autocode.ui.event.ButtonType;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -18,10 +16,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;

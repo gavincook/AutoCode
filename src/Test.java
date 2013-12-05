@@ -1,15 +1,80 @@
+import javax.annotation.Resource;
 
 import org.antstudio.autocode.annotation.Column;
 
 
 public class Test {
 
-	@Column(name="id")
+	/* @Column
+	 /*dadas*   */	@Resource private String a = "@Column//";/*ss*/
+	@Deprecated
+	private String no="ÊµãËØïÂ≠ó;Á¨¶‰∏≤";	@Column(name="id")
+	
+	@Resource
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	private String id;
 	
-	@Column(name="–’√˚")
-	private String name;
+	@
+	org
+	.
+	antstudio
+	.
 	
+	autocode
+	.
+	annotation
+	.
+	Column
+	
+	
+	
+	
+	
+	
+	
+	(
+			
+			name
+			
+			=
+	
+			"ÂßìÂêç"
+			
+			)
+	
+	
+	
+	
+	private
+	
+	
+	
+		
+	String 
+	
+	
+	
+	
+	name
+	
+	
+	
+	
+	
+	;
+	
+	private String test="@@@";
 	
 	public static void main(String[] args) {
 		System.out.println(Test.class.getDeclaredFields()[0].isAnnotationPresent(Column.class));
