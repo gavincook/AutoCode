@@ -1,18 +1,23 @@
 
+import java.io.UnsupportedEncodingException;
+
 import org.antstudio.autocode.annotation.Column;
 
 
 public class Test {
 
-	@Column(name="id")
+	/**
+	 * 你妹大阿什顿啊@Column
+	 */
+	@Column	(name="id")/*asdasd*///asdasdasd
 	private String id;
+	//sadasd
+	@Column(name="名字")				/*asdasd*///asdasdasd
+	private String name;//asdasdasd
 	
-	@Column(name="����")
-	private String name;
 	
-	
-	public static void main(String[] args) {
-		System.out.println(Test.class.getDeclaredFields()[0].isAnnotationPresent(Column.class));
+	public static void main(String[] args) throws UnsupportedEncodingException {
+		System.out.println("名".getBytes("GB2312").length);
 	}
 
 	public String getId() {
