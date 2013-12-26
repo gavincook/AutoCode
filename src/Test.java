@@ -9,11 +9,17 @@ public class Test {
 	/**
 	 * 你妹大阿什顿啊@Column
 	 */
-	@Column	(name="id")/*asdasd*///asdasdasd
+	@          Column
+	(
+	    name
+	    =
+	    "id")/*asdasd*///asdasdasd
 	private String id;
 	//sadasd
-	@Column(name="名字")				/*asdasd*///asdasdasd
-	private String name;//asdasdasd
+	@     Column(name="名\"字")				/*asdasd*///asdasdasd
+	private 
+	String
+	name = ",sd";//asdasdasd
 	
 	
 	public static void main(String[] args) throws UnsupportedEncodingException {

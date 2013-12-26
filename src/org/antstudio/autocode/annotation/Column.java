@@ -7,9 +7,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * ÓÃÓÚ±êÊ¾×Ö¶ÎÊÇ·ñÐèÒª³Ö¾Ã»¯
+ * ï¿½ï¿½ï¿½Ú±ï¿½Ê¾ï¿½Ö¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Òªï¿½Ö¾Ã»ï¿½
  * @author Gavin
- * @date 2013-10-20 ÏÂÎç5:07:30
+ * @date 2013-10-20 ï¿½ï¿½ï¿½ï¿½5:07:30
  */
 @Target({ElementType.METHOD,ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -18,4 +18,5 @@ public @interface Column {
 
 	public String name();
 	
+	public String dbType() default "";
 }

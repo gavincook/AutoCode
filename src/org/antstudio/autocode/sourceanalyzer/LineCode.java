@@ -1,8 +1,8 @@
 package org.antstudio.autocode.sourceanalyzer;
 /**
- * ����ɾ������ע�͵�����ģ��
+ * 用于删除代码注释的数据模型
  * @author Gavin
- * @date 2013-12-22 ����9:47:12
+ * @date 2013-12-22 下午9:47:12
  */
 public class LineCode{
     private String originCode;
@@ -30,7 +30,7 @@ public class LineCode{
     }
     
     /**
-     * ����//ע�ͱ�ǵ�λ��
+     * 查找//注释标记的位置
      * @return
      */
     private int calcQuotation(){
@@ -49,7 +49,7 @@ public class LineCode{
                 quotationNum++;  
             }
             if(lastByte!=0){
-            	firstByte = lastByte;
+                firstByte = lastByte;
             }
             lastByte = b;
         }
@@ -57,52 +57,52 @@ public class LineCode{
     }
     
     private void removeComment(){
-        if(!beforeOnlyStart){//ֻ������䲻��ע�Ϳ�������
+        if(!beforeOnlyStart){//只处理语句不在注释块里的情况
             int lineCommentPostion = calcQuotation();
             if(lineCommentPostion!=-1){
-            	//�������ֽ����鴦���������û�ȡ��λ��Ȼ��ʹ��substring������Ϊ�п��������Ļ�������ռλ��ȷ�����ַ���һ�����Ļ�ռ2��gb2312������������(utf-8)�ֽڣ�
-            	//����string��Ὣ���е����Ļ��������ַ���Ϊһ���������ַ����������byte���������ĳ��Ⱥ�string���������ĳ��Ȳ�һ��
-            	byte[] originCodeBytes = new byte[lineCommentPostion];
-            	System.arraycopy(originCode.getBytes(), 0, originCodeBytes, 0, lineCommentPostion) ;
+                //这里用字节数组处理，而不用获取的位置然后使用substring，是因为有可能有中文或者其他占位不确定的字符，一个中文会占2（gb2312）个或者三个(utf-8)字节，
+                //但是string里会将所有的中文或者其他字符作为一个单独的字符处理，因此byte遍历出来的长度和string里面真正的长度不一致
+                byte[] originCodeBytes = new byte[lineCommentPostion];
+                System.arraycopy(originCode.getBytes(), 0, originCodeBytes, 0, lineCommentPostion) ;
                 originCode = new String(originCodeBytes);
             }
         }
         int startPosition = originCode.indexOf("/*");
-        if(beforeOnlyStart){//������ע�ͽ�����  */
+        if(beforeOnlyStart){//首先找注释结束符  */
            startPosition =  originCode.indexOf("*/");
            if(startPosition>-1){
-        	   onlyStart = false;
+               onlyStart = false;
            }
         }
         int endPosition = -1;
-        if(startPosition>-1){//����ҵ�ע�ͱ��
-            if(!beforeOnlyStart){//������Ϊ�˴�������  "private .. /*..."�Ĵ���
+        if(startPosition>-1){//如果找到注释标记
+            if(!beforeOnlyStart){//这里是为了处理形如  "private .. /*..."的代码
                 codeWithoutComment.append(" ").append(originCode.substring(0,startPosition));
             }else{
-            	 startPosition = originCode.indexOf("/*",startPosition+2);//��ʱ��startPosition�ǽ�����־��λ��
+                 startPosition = originCode.indexOf("/*",startPosition+2);//此时的startPosition是结束标志的位置
             }
-            //�������ҿ�ʼ��һ����ʼ���
+            //继续查找开始下一个开始标记
             //startPosition = originCode.indexOf("/*",startPosition+2);
-            while(startPosition>-1){//һֱѭ����û�п�ʼ���Ϊֹ
-                if(startPosition>endPosition&&endPosition!=-1){//����ʼ��Ǵ�����һ�εĽ�����ǣ���ȡ�м�Ĵ���
+            while(startPosition>-1){//一直循环到没有开始标记为止
+                if(startPosition>endPosition&&endPosition!=-1){//当开始标记大于上一次的结束标记，截取中间的代码
                     codeWithoutComment.append(" ").append(originCode.substring(endPosition+2,startPosition));
                 }
-                //���ҵ�ǰ��ʼ��ǵĽ������
+                //需找当前开始标记的结束标记
                 endPosition = originCode.indexOf("*/",startPosition+2);
-                //���������С�ڿ�ʼ��ǣ���û�к͵�ǰ��ʼ���ƥ��Ľ�����ǣ�����ѭ��.���磺"/* comment "
+                //当结束标记小于开始标记，即没有和当前开始标记匹配的结束标记，跳出循环.形如："/* comment "
                 if(endPosition<startPosition){
                     onlyStart = true;
                     break;
                 }
-                //����������һ����ʼ���
+                //继续查找下一个开始标记
                 startPosition = originCode.indexOf("/*",endPosition+2);
             }
-            //�����һ����ʼ���С����һ��������ǣ���ô����һ��������Ǻ�Ĵ���ȡ����������:"/* comment */ private .."
+            //如果下一个开始标记小于上一个结束标记，那么将上一个结束标记后的代码取出来，形如:"/* comment */ private .."
             if(startPosition<endPosition){
                 codeWithoutComment.append(" ").append(originCode.substring(endPosition+2));
             }
-        }else{//���û���κδ���ע�ͱ��
-            if(beforeOnlyStart){//֮ǰ��δ������ע�ͱ�ǣ���ô����Ҳ��ע��
+        }else{//如果没有任何代码注释标记
+            if(beforeOnlyStart){//之前有未结束的注释标记，那么此行也是注释
                onlyStart = true;
             }else{
                 codeWithoutComment.append(" ").append(originCode);
