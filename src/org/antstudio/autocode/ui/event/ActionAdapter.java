@@ -1,27 +1,21 @@
 package org.antstudio.autocode.ui.event;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.antstudio.autocode.annotation.Column;
-import org.antstudio.autocode.classloader.FileSystemClassLoader;
 import org.antstudio.autocode.container.Container;
 import org.antstudio.autocode.dialog.TreeDialog;
 import org.antstudio.autocode.service.AutoCodeService;
+import org.antstudio.autocode.sourceanalyzer.SourceAnalyze;
 import org.antstudio.autocode.ui.MainInterface;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
-import freemarker.template.TemplateException;
 
 public class ActionAdapter extends MouseAdapter{
 
@@ -36,7 +30,7 @@ public class ActionAdapter extends MouseAdapter{
 	@Override
 	public void mouseUp(MouseEvent e) {
 		switch (type) {
-		case Generate:
+		case Generate://代码生成
 			Map<String,Object> params = Container.get("mainInterface", MainInterface.class).getValues();
 			AutoCodeService autoCodeService = Container.get("autoCodeService", AutoCodeService.class);
 			if("Table".equals(params.get("type"))){//数据模式
@@ -48,51 +42,34 @@ public class ActionAdapter extends MouseAdapter{
 					e1.printStackTrace();
 				} 
 			}else{//domain模式
-				FileSystemClassLoader classLoader = new FileSystemClassLoader(params.get("baseDir").toString(),this.getClass().getClassLoader());
-				Map<String,Object> columns = new TreeMap<String, Object>();
-				try {
-					Class<?> c = classLoader.loadClass(params.get("domainName").toString());
-					//data.put(key, value)
-					for(Field f:c.getDeclaredFields()){
-						if(f.isAnnotationPresent(Column.class)){
-							columns.put(f.getName(),f.getAnnotation(Column.class));
-						}
-					}
-					Map<String,Object> data = new HashMap<String, Object>();
-					data.put("columns", columns);
-					try {
-						autoCodeService.generateCode(data);
-					} catch (TemplateException e1) {
-						e1.printStackTrace();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				} catch (ClassNotFoundException e1) {
-					e1.printStackTrace();
+				
+				SourceAnalyze sa = new SourceAnalyze(params.get("domainPath").toString());
+				Map<String,Object> data = new HashMap<String, Object>();
+				data.putAll(params);
+				try{
+					data.put("columns", sa.getColumns());
+					autoCodeService.generateCode(data);
+				}catch (Exception ex) {
+						ex.printStackTrace();
+			         MessageBox messageBox = new MessageBox(shell, SWT.APPLICATION_MODAL | SWT.YES | SWT.NO);  
+			         messageBox.setText("错误");  
+			         messageBox.setMessage(ex.getLocalizedMessage());  
 				}
+				
 			}
 			break;
 			
 		case Cancel:
 			this.shell.close();
 			break;
-		
-		case BasedirSelector:
-			DirectoryDialog ddg = new DirectoryDialog(shell);
-			Container.get("baseDir", Text.class).setText(ddg.open());
-			Container.get("domainSelector", Button.class).setEnabled(true);
-			break;
 		case DomainSelector:
-			if(Container.get("fromProject", Boolean.class)){//从项目现则
-				System.out.println(shell.getDisplay()+"..."+Container.get("contextPath", String.class));
+			if(Container.get("fromProject", Boolean.class)){//从项目选择
 				TreeDialog td = new TreeDialog(Display.getCurrent().getActiveShell(), Container.get("contextPath", String.class));
-				td.open();
+				Container.get("domainPath", Text.class).setText(td.open());
 			}else{
 				FileDialog fdg = new FileDialog(shell);
-				String baseDir = Container.get("baseDir", Text.class).getText().replaceAll("\\\\", "\\\\\\\\");
-				fdg.setFilterPath(baseDir);
-				fdg.setFilterExtensions(new String[]{"*.class"});
-				Container.get("domainName", Text.class).setText(fdg.open().replaceAll(baseDir, "").replace(".class", ""));
+				fdg.setFilterExtensions(new String[]{"*.java"});
+				Container.get("domainPath", Text.class).setText(fdg.open());
 			}
 			break;
 		default:

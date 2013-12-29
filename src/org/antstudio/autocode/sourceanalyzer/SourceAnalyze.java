@@ -4,35 +4,37 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 /**
+ * 源码分析，用于获取domain中使用@Column标示了的字段，而不使用加载class的形式，因为可能domain会依赖很多其他的三方包，这样减少了类加载
  * @author Gavin
  * @Date Dec 6, 2013 11:01:45 AM
  */
 public class SourceAnalyze {
-    private static Map<String,String> JAVA_MAPPING_TO_DB = new HashMap<String,String>(){
-        private static final long serialVersionUID = 1L;
-    {
-        put("String", "varchar");
-        put("int", "int");
-        put("Integer", "int");
-        put("Long", "bigint");
-        put("long", "bigint");
-        put("double", "double");
-        put("Double", "double");
-        put("Float", "float");
-        put("float", "float");
-        put("Date", "date");
-        put("boolean", "bit");
-        put("Boolean", "bit");
-    }};
-    public static void main(String[] args) throws Exception {
-        File javaFile = new File("E:\\workspace\\person\\AutoCode\\src\\Test.java");
+    
+    /**
+     * 源码路径(java)
+     */
+    private String sourcePath;
+    
+    public SourceAnalyze(String sourcePath){
+    	this.sourcePath = sourcePath;
+    }
+    
+    /**
+     * 获取源码中使用@Column标示了的字段
+     * @return
+     * @throws Exception
+     */
+    public List<ColumnDefinition> getColumns() throws Exception{
+    	List<ColumnDefinition> columns = new ArrayList<ColumnDefinition>();
+
+        File javaFile = new File(sourcePath);
         InputStreamReader reader = new InputStreamReader(new FileInputStream(javaFile), "UTF-8");
         BufferedReader br = new BufferedReader(reader);
         String line = br.readLine();
@@ -65,17 +67,18 @@ public class SourceAnalyze {
                 while(matcher.find()){
                     if(position==-1||position>matcher.start()){
                         if(first){
-                            columnDefinition.setDbType(JAVA_MAPPING_TO_DB.get(matcher.group()));
+                            columnDefinition.setJavaType(matcher.group());
                             first = !first;
                         }else{
                             columnDefinition.setFieldName(matcher.group());
                         }
                     }
                 }
-                System.out.println(columnDefinition);
+                columns.add(columnDefinition);
             }
         }
         
+        return columns;
     }
 
 }

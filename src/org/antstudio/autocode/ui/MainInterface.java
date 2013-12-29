@@ -1,13 +1,11 @@
 package org.antstudio.autocode.ui;
 
-import java.awt.CheckboxGroup;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.antstudio.autocode.container.Container;
 import org.antstudio.autocode.ui.event.ActionAdapter;
 import org.antstudio.autocode.ui.event.ButtonType;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -18,10 +16,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -44,7 +40,7 @@ public class MainInterface {
 	private Combo combo;
 	private Button btnCheckButton,btnCheckButton_1,btnRepository,btnJsp;
 	private TabFolder tf;
-	private Text baseDir,domainName;
+	private Text domainPath;
 	public void init(Shell parent){
 		GridLayout layout = new GridLayout(2, false);
 		Shell shell = new Shell(parent,SWT.SHEET);
@@ -66,7 +62,7 @@ public class MainInterface {
 			//数据库模式tab
 			TabItem dbTypeTab = new TabItem(tf, SWT.NONE);
 			dbTypeTab.setText("Table");
-			
+			dbTypeTab.setData("name","table");
 			
 			/*----------------------Domain模式tab--------------------------------*/
 			Composite domainModeContainer = new Composite(tf, SWT.FILL);
@@ -89,30 +85,16 @@ public class MainInterface {
 			
 			
 			//第二行
-			Label baseDirLabel = new Label(domainModeContainer, SWT.NONE);
-			baseDirLabel.setText("Base路径：");
-			baseDirLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-			baseDir = new Text(domainModeContainer, SWT.BORDER);
-			baseDir.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-			final Button baseDirSelector = new Button(domainModeContainer,SWT.NONE);
-			baseDirSelector.setText("  选择  ");
-			baseDirSelector.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-			
-			Container.register("baseDir", baseDir);
-			Container.register("baseDirSelector", baseDirSelector);
-			
-			//第三行
 			Label domainNameLabel = new Label(domainModeContainer, SWT.NONE);
-			domainNameLabel.setText("类名:");
+			domainNameLabel.setText("路径:");
 			domainNameLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-			domainName = new Text(domainModeContainer, SWT.BORDER);
-			domainName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+			domainPath = new Text(domainModeContainer, SWT.BORDER);
+			domainPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 			final Button domainSelector = new Button(domainModeContainer,SWT.NONE);
 			domainSelector.setText("  选择  ");
 			domainSelector.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-			domainSelector.setEnabled(false);//默认为不可点击,需要先选择basedir
 			
-			Container.register("domainName", domainName);
+			Container.register("domainPath", domainPath);
 			Container.register("domainSelector", domainSelector);
 			
 			//第四行
@@ -122,9 +104,8 @@ public class MainInterface {
 			packageName = new Text(domainModeContainer, SWT.BORDER);
 			packageName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 			
-			//为两个选择按钮分别添加事件处理
+			//为选择按钮添加事件处理
 			domainSelector.addMouseListener(new ActionAdapter(ButtonType.DomainSelector));
-			baseDirSelector.addMouseListener(new ActionAdapter(ButtonType.BasedirSelector));
 			
 			/**
 			 * domain 模式下的项目和文件系统选择方式
@@ -136,11 +117,8 @@ public class MainInterface {
 					Button btn = (Button) event.getSource();
 					if(btn.getSelection()){
 						Container.register("fromProject", true);
-						domainSelector.setEnabled(true);
-						baseDirSelector.setEnabled(false);
 					}else{
 						Container.register("fromProject", false);
-						baseDirSelector.setEnabled(true);
 					}
 				}
 	
@@ -153,6 +131,7 @@ public class MainInterface {
 			TabItem domainTypeTab = new TabItem(tf, SWT.NONE);
 			domainTypeTab.setText("Domain");
 			domainTypeTab.setControl(domainModeContainer);
+			domainTypeTab.setData("name", "domain");
 			/*----------------------/Domain模式tab--------------------------------*/
 			
 			
@@ -289,16 +268,15 @@ public class MainInterface {
 		params.put("repository", btnRepository.getSelection()+"");
 		params.put("jsp", btnJsp.getSelection()+"");
 		/*----------------------/数据库配置信息--------------------------------*/
-		
-		if("domain".equals(tf.getSelection()[0].getText())){
+		System.out.println(tf.getSelection()[0].getData("name"));
+		if("domain".equals(tf.getSelection()[0].getData("name"))){
 			params.put("package", packageName.getText());
 		}
 		
 		params.put("type", tf.getSelection()[0].getText());//当前生成模式
 		
 		/*----------------------domain信息--------------------------------*/
-		params.put("baseDir", baseDir.getText());
-		params.put("domainName", domainName.getText().replaceAll("\\\\", ".").substring(1));
+		params.put("domainPath", domainPath.getText());
 		/*----------------------/domain信息--------------------------------*/
 		return params;
 	}

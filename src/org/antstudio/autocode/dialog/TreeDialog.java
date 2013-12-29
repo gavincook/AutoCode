@@ -31,6 +31,7 @@ public class TreeDialog extends Dialog{
 	private static String FOLDER_ICO = "folder_16.png",JAVA_ICO="java_16.png";
 	private Tree tree;
 	
+	private String currentSelectSourcePath;
 	public TreeDialog(Shell parent,String projectPath) {
 		super(parent,SWT.NONE);
 		this.shell = new Shell(parent, SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM);
@@ -123,7 +124,8 @@ public class TreeDialog extends Dialog{
 			@Override
 			public void handleEvent(Event arg0) {
 				for(TreeItem ti:tree.getSelection()){
-					System.out.println(ti.getData("path"));
+					currentSelectSourcePath = ((File)ti.getData("path")).getAbsolutePath();
+					shell.close();
 				}
 			}
 		});
@@ -142,7 +144,7 @@ public class TreeDialog extends Dialog{
 		btnGroup.setLayout(new RowLayout());
 	}
 
-	public void open(){
+	public String open(){
 		shell.open();
 		shell.layout();  
         Display display = shell.getDisplay();  
@@ -151,5 +153,10 @@ public class TreeDialog extends Dialog{
                 display.sleep();  
         } 
         shell.dispose();
+        if(currentSelectSourcePath!=null){
+        	return currentSelectSourcePath;
+        }else{
+        	return "";
+        }
 	}
 }
